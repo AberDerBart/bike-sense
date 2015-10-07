@@ -109,6 +109,83 @@ volatile uint8_t pixels[] = {
 volatile char keys;
 volatile char i2c_reg = 0xff;
 
+void clear(){
+	int i;
+	for(i=0;i<192;i++){
+		pixels[i]=0x00;
+	}
+}
+
+void setPixel(char x,char y){
+	pixels[24*y+x]=0x1f;	
+}
+
+void printDigit(char digit,char offX,char offY){
+
+	setPixel(offX+2,offY);
+	setPixel(offX+2,offY+2);
+	setPixel(offX+2,offY+4);
+
+	switch(digit){
+	case 8:
+		setPixel(offX+0,offY+3);
+	case 9:
+		setPixel(offX+0,offY+1);
+	case 3:
+		setPixel(offX+0,offY+2);
+		setPixel(offX+1,offY+2);
+		setPixel(offX+0,offY+4);
+		setPixel(offX+1,offY+4);
+	case 7:
+		setPixel(offX+0,offY);
+		setPixel(offX+1,offY);
+	case 1:
+		setPixel(offX+2,offY+1);
+		setPixel(offX+2,offY+3);
+		break;
+	case 6:
+		setPixel(offX,offY+3);
+	case 5:
+		setPixel(offX,offY+1);
+		setPixel(offX+2,offY+3);
+	case 2:
+		setPixel(offX+1,offY+2);
+	case 0:
+		setPixel(offX+1,offY);
+		setPixel(offX,offY+4);
+		setPixel(offX+1,offY+4);
+	case 4:
+		setPixel(offX,offY);
+		setPixel(offX,offY+2);
+	default:
+		break;
+	}
+
+	switch(digit){
+	case 0:
+		setPixel(offX,offY+1);
+		setPixel(offX+2,offY+3);
+	case 2:
+		setPixel(offX+2,offY+1);
+		setPixel(offX,offY+3);
+		break;
+	case 4:
+		setPixel(offX,offY+1);
+		setPixel(offX+2,offY+1);
+		setPixel(offX+1,offY+2);
+		setPixel(offX+2,offY+3);
+	default:
+		break;
+	}
+}
+
+void print(unsigned char number){
+	char digit1=number/10;
+	char digit2=number%10;
+	if(digit1)printDigit(digit1,0,3);
+	printDigit(digit2,4,3);
+}
+
 int main(void)
 {
 	PORTA = 0;
@@ -123,6 +200,9 @@ int main(void)
 	TWBR = 0xff;
 	TWAR = 0x46 << 1;
 	TWCR = (1 << TWEA) | (1 << TWEN) | (1 << TWINT) | (1 << TWIE);
+	
+	clear();
+	print(90);
 	//clear_gain();
 	sei();
 	draw_loop();
