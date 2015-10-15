@@ -45,6 +45,13 @@
 #define LED_SDI			(1 << PC3)
 #define LED_OE_N		(1 << PC7)
 
+#define DIAMETER 28.
+#define PI 3.1415926535
+#define POLES 8.
+#define TICKSPERSECOND 10.
+#define INCHPERMETER 40.
+#define MPS2KPH 3.6
+
 #define set(port,x) port |= (x)
 #define clr(port,x) port &= ~(x)
 
@@ -108,6 +115,7 @@ volatile uint8_t pixels[] = {
 
 volatile char keys;
 volatile char i2c_reg = 0xff;
+volatile int ticksPerRound[]={0,0,0};
 
 void clear(){
 	int i;
@@ -117,7 +125,7 @@ void clear(){
 }
 
 void setPixel(char x,char y){
-	pixels[24*y+x]=0x1f;	
+	pixels[24*y+x+16]=0x1f;	
 }
 
 void printDigit(char digit,char offX,char offY){
@@ -184,6 +192,12 @@ void print(unsigned char number){
 	char digit2=number%10;
 	if(digit1)printDigit(digit1,0,3);
 	printDigit(digit2,4,3);
+}
+
+char calcSpeed(){
+	float medTicks=(float)(ticksPerRound[0]+ticksPerRound[1]+ticksPerRound[2])/3.;
+	float rps=1./(POLES*medTicks*TICKSPERSECOND);
+	return PI*DIAMETER*MPS2KPH*rps;
 }
 
 int main(void)
