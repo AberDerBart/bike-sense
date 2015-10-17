@@ -177,7 +177,7 @@ lframeend:
 	COM	PARAM
 	OUT	_SFR_IO_ADDR(PORTD), PARAM
 	CBI	_SFR_IO_ADDR(PORTB), LED_OE_N	; /Scan
-	RJMP	Lframe_loop
+	;RJMP	Lframe_loop
 	RET
 .endfunc
 

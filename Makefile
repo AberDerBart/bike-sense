@@ -3,7 +3,7 @@ OBJ			= main.o rpi-sense.o
 
 MCU_TARGET		= attiny88
 
-OPTIMIZE		= -Os
+OPTIMIZE		= 
 
 CC			= avr-gcc
 

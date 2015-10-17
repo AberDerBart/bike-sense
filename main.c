@@ -115,7 +115,10 @@ volatile uint8_t pixels[] = {
 
 volatile char keys;
 volatile char i2c_reg = 0xff;
-volatile int ticksPerRound[]={0,0,0};
+//initialize [ticksPerRound] with a value other than 0 to avoid division by 0 errors
+volatile int ticksPerRound[]={13,57,25};
+unsigned char menu;
+
 
 void clear(){
 	int i;
@@ -188,8 +191,15 @@ void printDigit(char digit,char offX,char offY){
 }
 
 void print(unsigned char number){
-	char digit1=number/10;
-	char digit2=number%10;
+	int i;
+	for(i=0;i<8;i++){
+		if(number & 1<<i){
+			setPixel(i,0);
+		}
+	}
+	number=number%100;
+	unsigned char digit1=number/10;
+	unsigned char digit2=number%10;
 	if(digit1)printDigit(digit1,0,3);
 	printDigit(digit2,4,3);
 }
@@ -200,8 +210,8 @@ char calcSpeed(){
 	return PI*DIAMETER*MPS2KPH*rps;
 }
 
-int main(void)
-{
+
+int main(void){
 	PORTA = 0;
 	PORTB = 1;
 	PORTC = 0;
@@ -215,10 +225,23 @@ int main(void)
 	TWAR = 0x46 << 1;
 	TWCR = (1 << TWEA) | (1 << TWEN) | (1 << TWINT) | (1 << TWIE);
 	
-	clear();
-	print(90);
 	//clear_gain();
-	sei();
-	draw_loop();
-	for(;;);
+	//sei();
+	for(;;){
+		draw_loop();
+		clear();
+		//drawMenuSymbol();
+		switch(keys){
+		case 1:
+			menu++;
+			if(menu>99)menu=99;
+			break;
+		case 4:
+			menu--;
+			if(menu>99)menu=0;
+			break;
+		default:
+			break;
+		}
+	}
 }
